@@ -49,6 +49,28 @@ app.get("/movies/update", (req, res) => {
   res.json({ messege: "Updated" });
 });
 
+app.get("/movies/delete", (req, res) => {
+  const { id } = req.query;
+
+  // 1. Read the file
+  const data = fs.readFileSync("data/movies.json", "utf8");
+  const movies = JSON.parse(data);
+
+  // 2. Filter out the movie with the given id
+  const updatedMovies = movies.filter((movie) => movie.id !== parseInt(id));
+
+  // Check if any movie was deleted
+  if (updatedMovies.length === movies.length) {
+    return res.status(404).json({ message: "Movie not found" });
+  }
+
+  // 3. Write the updated array back to the file
+  const moviesString = JSON.stringify(updatedMovies, null, 4);
+  fs.writeFileSync("data/movies.json", moviesString);
+
+  res.json({ message: "Deleted" });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
