@@ -31,13 +31,18 @@ app.get("/movies/create", (req, res) => {
 
 // update obj of json
 app.get("/movies/update", (req, res) => {
-  const { name } = req.query;
+  const { id, name } = req.query;
+
   // 1. read file
   const data = fs.readFileSync("data/movies.json", "utf8");
   const movies = JSON.parse(data);
-  // 2. find the item
-  movies.find((id = 1736158100990), name);
-  // 3. update the json arrey
+  // 2. find the movie by id
+  const movie = movies.find((movie) => movie.id === 1736158100990);
+
+  // 3. Update the movie name
+  movie.name = name;
+
+  // 4. update the json arrey
   const moviesString = JSON.stringify(movies, null, 4);
   fs.writeFileSync("data/movies.json", moviesString);
 
