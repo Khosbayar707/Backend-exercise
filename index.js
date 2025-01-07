@@ -98,7 +98,7 @@ const createNewMovie = () => {
   res.json({ messege: "Success" });
 };
 
-app.post("/movie/:name", createNewMovie);
+app.post("/movie/create/:name", createNewMovie);
 
 app.put("/movie/update/:name");
 
