@@ -9,62 +9,12 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// read file
-app.get("/movies", (req, res) => {
+const findAllMovies = () => {
   const data = fs.readFileSync("data/movies.json", "utf8");
   const movies = JSON.parse(data);
-  res.json(movies);
-});
+};
 
-// add new obj to json
-app.get("/movies/create", (req, res) => {
-  const { name } = req.query;
-  // 1. read file
-  const data = fs.readFileSync("data/movies.json", "utf8");
-  const movies = JSON.parse(data);
-  // 2. push to json
-  movies.push({ id: Date.now(), name });
-  // 3. write json file
-  const moviesString = JSON.stringify(movies, null, 4);
-  fs.writeFileSync("data/movies.json", moviesString);
-
-  res.json({ messege: "Success" });
-});
-// update obj of json
-app.get("/movies/update", (req, res) => {
-  const { id, name } = req.query;
-
-  // 1. read file
-  const data = fs.readFileSync("data/movies.json", "utf8");
-  const movies = JSON.parse(data);
-  // 2. find the movie by id
-  const convertedNumber = parseInt(id);
-  const movie = movies.find((movie) => movie.id === convertedNumber);
-
-  // 3. Update the movie name
-  movie.name = name;
-
-  // 4. update the json arrey
-  const moviesString = JSON.stringify(movies, null, 4);
-  fs.writeFileSync("data/movies.json", moviesString);
-
-  res.json({ messege: "Updated" });
-});
-// delete obj of json
-app.get("/movies/delete", (req, res) => {
-  const { id } = req.query;
-
-  // 1. Read the file
-  const data = fs.readFileSync("data/movies.json", "utf8");
-  const movies = JSON.parse(data);
-  const convertedNumber = parseInt(id);
-  const movie = movies.filter((movie) => movie.id !== convertedNumber);
-
-  const moviesString = JSON.stringify(movie, null, 4);
-  fs.writeFileSync("data/movies.json", moviesString);
-
-  res.json({ message: "Deleted" });
-});
+//1. find movie by id
 
 const findById = () => {
   const { id } = req.params;
@@ -76,16 +26,19 @@ const findById = () => {
 };
 app.get("/movie/:id", findById);
 
-const deleteById = () => {
-  const id = req.params.id;
-  const data = fs.readFileSync("data/movies.json", "utf8");
-  const movies = JSON.parse(data);
-  const newMovieList = movies.filter((movie) => movie.id !== parseInt(id));
-  const moviesString = JSON.stringify(newMovieList, null, 4);
-  fs.writeFileSync("data/movies.json", moviesString);
-  res.json({ message: "Deleted" });
-};
-app.delete("/movie/:id", deleteById);
+//2. delete move from arrey
+
+app.delete("/movie/:id", (req, res) => {
+  const movieId = Number(req.params.id);
+  const movies = findAllMovies();
+
+  const updatedMovies = movies.filter((movie) => movie.id !== movieId);
+  const movieString = JSON.stringify(updatedMovies, null, 4);
+  fs.writeFileSync("data/movies.json", movieString);
+  res.json({ messege: "Deleted" });
+});
+
+//3. add new movie to arrey
 
 const createNewMovie = () => {
   const { name } = req.params;
@@ -99,6 +52,8 @@ const createNewMovie = () => {
 };
 
 app.post("/movie/create/:name", createNewMovie);
+
+//4. update movie data
 
 app.put("/movie/update/:name");
 
