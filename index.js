@@ -52,21 +52,18 @@ app.post("/create", createNewMovie);
 
 //4. update movie data
 const updateMovie = (req, res) => {
-  const { id } = req.params; // Extract the id from the request parameters
-  const { name } = req.body; // Extract the name from the request body
+  const id = req.params.id;
+  const body = req.body;
+  const movies = findAllMovies();
 
-  const data = fs.readFileSync("data/movies.json", "utf8");
-  const movies = JSON.parse(data);
+  const updateMovie = movies.map((movie) => {
+    if (movie.id === Number(id)) {
+      return { ...movie, ...body };
+    }
+    return movie;
+  });
 
-  // Find the movie by ID and update its name
-  const movieIndex = movies.findIndex((movie) => movie.id === parseInt(id));
-  if (movieIndex === -1) {
-    return res.status(404).json({ message: "Movie not found" });
-  }
-
-  movies[movieIndex].name = name;
-  // Save the updated list back to the file
-  const moviesString = JSON.stringify(movies, null, 4);
+  const moviesString = JSON.stringify(updateMovie, null, 4);
   fs.writeFileSync("data/movies.json", moviesString);
 
   res.json({ message: "Movie updated", movies });
